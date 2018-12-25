@@ -373,36 +373,56 @@ module.exports = {
           // to compile SASS files into CSS.
           // By default we support SASS Modules with the
           // extensions .module.scss or .module.sass
+          // {
+          //   test: sassRegex,
+          //   exclude: sassModuleRegex,
+          //   loader: getStyleLoaders(
+          //     {
+          //       importLoaders: 2,
+          //       sourceMap: shouldUseSourceMap,
+          //     },
+          //     'sass-loader'
+          //   ),
+          //   // Don't consider CSS imports dead code even if the
+          //   // containing package claims to have no side effects.
+          //   // Remove this when webpack adds a warning or an error for this.
+          //   // See https://github.com/webpack/webpack/issues/6571
+          //   sideEffects: true,
+          // },
+          // Adds support for CSS Modules, but using SASS
+          // using the extension .module.scss or .module.sass
+          // {
+          //   test: sassModuleRegex,
+          //   loader: getStyleLoaders(
+          //     {
+          //       importLoaders: 2,
+          //       sourceMap: shouldUseSourceMap,
+          //       modules: true,
+          //       getLocalIdent: getCSSModuleLocalIdent,
+          //     },
+          //     'sass-loader'
+          //   ),
+          // },
           {
             test: sassRegex,
             exclude: sassModuleRegex,
-            loader: getStyleLoaders(
-              {
-                importLoaders: 2,
-                sourceMap: shouldUseSourceMap,
-              },
-              'sass-loader'
-            ),
-            // Don't consider CSS imports dead code even if the
-            // containing package claims to have no side effects.
-            // Remove this when webpack adds a warning or an error for this.
-            // See https://github.com/webpack/webpack/issues/6571
-            sideEffects: true,
+            use: getStyleLoaders({ importLoaders: 2 }, 'sass-loader'),
           },
           // Adds support for CSS Modules, but using SASS
           // using the extension .module.scss or .module.sass
           {
             test: sassModuleRegex,
-            loader: getStyleLoaders(
-              {
-                importLoaders: 2,
-                sourceMap: shouldUseSourceMap,
-                modules: true,
-                getLocalIdent: getCSSModuleLocalIdent,
-              },
-              'sass-loader'
-            ),
+            use: getStyleLoaders({ importLoaders: 2 }).concat({
+              loader: require.resolve('sass-loader'),
+              options: {
+                includePaths: [paths.appSrc + '/styles'],
+                //상대경로를 입력 할 필요 없이 styles 디렉토리 기준 절대경로로
+                data: `@import 'utils';`
+                //Sass 파일을 읽을 때 마다 앞부분에 특정 코드를 포함시켜줌
+              }
+            })
           },
+
           // "file" loader makes sure assets end up in the `build` folder.
           // When you `import` an asset, you get its filename.
           // This loader doesn't use a "test" so it will catch all modules

@@ -304,14 +304,15 @@ module.exports = {
           // using the extension .module.scss or .module.sass
           {
             test: sassModuleRegex,
-            use: getStyleLoaders(
-              {
-                importLoaders: 2,
-                modules: true,
-                getLocalIdent: getCSSModuleLocalIdent,
-              },
-              'sass-loader'
-            ),
+            use: getStyleLoaders({ importLoaders: 2 }).concat({
+              loader: require.resolve('sass-loader'),
+              options: {
+                includePaths: [paths.appSrc + '/styles'],
+                //상대경로를 입력 할 필요 없이 styles 디렉토리 기준 절대경로로
+                data: `@import 'utils';`
+                //Sass 파일을 읽을 때 마다 앞부분에 특정 코드를 포함시켜줌
+              }
+            })
           },
           // "file" loader makes sure those assets get served by WebpackDevServer.
           // When you `import` an asset, you get its (virtual) filename.
